@@ -29,6 +29,12 @@ module Quickbase
       }
     end
     
+    def user_roles
+      response = connection.http.post("API_UserRoles")
+      records = response.xpath("//user[@type='array']/user")
+      Hash[*records.map { |record| [record.xpath("id").text, record.xpath("name").text] }.flatten]
+    end
+    
     def do_query_return_nokogiri_obj(params)
       #useful method for debugging
       params[:fmt] = 'structured' if params[:fmt].nil? or params[:fmt].empty?
@@ -57,9 +63,5 @@ module Quickbase
       tags = Quickbase::Helper.hash_to_xml({:rid => rid.to_s})
       connection.http.post("API_DeleteRecord", tags)
     end
-  end
-  
-  class Api < API
-    puts "Class Api will be deprecated. Please use API instead."
   end
 end
